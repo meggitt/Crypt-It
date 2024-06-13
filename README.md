@@ -1,5 +1,6 @@
 # Crypt-It
 ![Crypt-It by Meghana Chevva](images/crypt-it.gif)
+
 Crypt-It is a robust Node.js application designed for secure file sharing and management. It empowers users with seamless registration, authentication, and file handling capabilities while prioritizing data security through advanced encryption techniques. Whether you're uploading sensitive documents or collaborating on confidential projects, Crypt-It ensures that your information remains private and protected at every step.
 
 
