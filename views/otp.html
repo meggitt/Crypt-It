@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+        .close {
+            position: absolute;
+            top: 3px;
+            right: 17px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container2">
+        <h1>Crypt-It Registration</h1>
+        <div class="container">
+            <form action="/register" method="post" id="registerForm">
+                <input type="text" name="firstName" placeholder="First Name" required>
+                <input type="text" name="lastName" placeholder="Last Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+                <div id="errorMessage" class="error"></div>
+                <button type="submit" style="width: 100%;" class="button primary fit">Register</button>
+                <p style="text-align: center;">Already a user? </p>
+                <button type="button" class="button primary fit" onclick="window.location.href='/login'">Sign In</button>
+
+            </form>
+        </div>
+    </div>
+    <div id="overlay" class="overlay" style="display: block;"></div>
+    <div id="popup" class="popup" style="display: block;">
+        <span class="close" onclick="window.location.href='/login'">&times;</span>
+        <form action="/otp" method="post">
+            <p>An e-mail has been sent to your email address<br>(check spam if not in inbox)</p>
+            <h3>Verify OTP</h3>
+            <input type="text" name="otp" placeholder="Enter OTP" required>
+            <div id="errorMessages" class="error"></div>
+            <button type="submit" class="primary button fit">Verify OTP</button>
+        </form>
+    </div>
+    <script>
+        if (performance.navigation.type === 1) {
+            // Page was refreshed, remove URL parameters
+            history.replaceState({}, document.title, window.location.pathname);
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const registrationFailedOtp = urlParams.get('registrationFailedOtp');
+            if (registrationFailedOtp === 'true') {
+            document.getElementById('errorMessages').textContent="Incorrect or expired otp.";
+        }
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            const password = document.querySelector('input[name="password"]').value;
+            const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+            const email = document.querySelector('input[name="email"]').value;
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                document.getElementById('errorMessage').textContent = "Passwords do not match!";
+            }
+        });
+    </script>
+</body>
+
+</html>

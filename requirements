@@ -1,0 +1,11 @@
+express
+bcryptjs
+path
+nodemailer
+crypto
+mongoose
+multer
+express-session
+body-parser
+ejs
+connect-mongo

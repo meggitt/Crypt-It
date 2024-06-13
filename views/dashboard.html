@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            overflow: scroll;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+                .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 1;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+            max-width: 400px;
+            width: 100%;
+            display: none;
+            z-index: 2;
+            border: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            border-top: 0;
+            padding: 0rem 1rem 1rem 2rem;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            overflow: scroll;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Updated styles */
+        .file-actions {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(100, 100, 100, 0.7);
+            /* Adjust opacity as needed */
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        article:hover .file-actions {
+            display: flex;
+        }
+
+        article {
+            /* Existing styles */
+            position: relative;
+            /* Ensure relative positioning for absolute children */
+        }
+
+        /* Style for buttons within .file-actions */
+        .file-actions button {
+            max-width: 40px;
+            margin: 5px;
+            padding: 4em 4em 4em 4em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Additional styling for specific buttons */
+        .file-actions button.view {
+            background-color: #4CAF50;
+            /* Green */
+            color: white;
+        }
+
+        .file-actions button.share {
+            background-color: #2196F3;
+            /* Blue */
+            color: white;
+        }
+
+        .file-actions button.delete {
+            background-color: #f44336;
+            /* Red */
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container6">
+        <h1>Dashboard</h1>
+        <div class="container5">
+            <h3 class="dh">Welcome, <%= user.firstName %>
+                    <%= user.lastName %>!</h3>
+            <div style="display:flex">
+                <div style="width: 49%; background-color: rgba(255, 255, 255, 0.9);text-align: center;">
+                    <h2>Your Files</h2>
+                    <section style="flex-direction: column;align-items: flex-start;">
+                        <% if (userFiles.length===0) { %>
+                            <p>No files uploaded yet</p>
+                            <% } else { %>
+                                <% userFiles.forEach(file=> { %>
+                                    <article class="button primary fit"
+                                        style="max-width: 40%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        <%= file.fileName %>
+                                            <div class="file-actions">
+                                                <button class="button primary small"
+                                                    onclick="showViewModal('<%= file._id %>')"><i
+                                                        class="fa fa-eye"></i></button>
+                                                <button class="button primary small"
+                                                    onclick="showShareModal('<%= file._id %>')"><i
+                                                        class="fa fa-share-alt"></i></button>
+                                                <form id="deleteForm-<%= file._id %>"
+                                                    action="/delete-file/<%= file._id %>" method="post"
+                                                    style="display: inline;">
+                                                    <button type="button" class="button primary small"
+                                                        onclick="confirmDelete('<%= file._id %>')">
+                                                        <i class="material-icons" style="font-size: small;">delete</i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                    </article>
+                                    <% }) %>
+                                        <% } %>
+                    </section>
+                </div>
+                <div style="width: 2%;"> </div>
+                <div style="width: 49%;  background-color: rgba(255, 255, 255, 0.9);text-align: center;">
+                    <!-- Shared With You Section -->
+                    <h2>Files shared with you</h2>
+                    <section>
+                        <% if (sharedFiles.length===0) { %>
+                            <p>No files shared yet</p>
+                            <% } else { %>
+                                <% sharedFiles.forEach(file=> { %>
+                                    <article class="button primary fit"
+                                        style="max-width: 40%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        <%= file.fileName %>
+                                            <div class="file-actions">
+                                                <button class="button primary small"
+                                                    onclick="showViewModal('<%= file._id %>')"><i
+                                                        class="fa fa-eye"></i></button>
+                                                        <form id="deleteForm-<%= file._id %>"
+                                                            action="/delete-file/<%= file._id %>" method="post"
+                                                            style="display: inline;">
+                                                            <button type="button" class="button primary small"
+                                                                onclick="confirmDelete('<%= file._id %>')">
+                                                                <i class="material-icons" style="font-size: small;">delete</i>
+                                                            </button>
+                                                        </form>
+                                            </div>
+                                    </article>
+                                    <p style="margin-top: 0;margin-bottom: 4px;">shared by <%= file.userId.email %>
+                                    </p>
+                                    <% }) %>
+                                        <% } %>
+                    </section>
+                </div>
+            </div>
+            <div style="height: 1%;"> </div>
+            <div style="width: 100%; background-color: rgba(255, 255, 255, 0.9);text-align: center; align-self: center;">
+                <!-- Upload Form -->
+                <h2 style="padding-top: 20px; margin-bottom: 2px;">Upload a new file</h2>
+                <p style="margin-top: 0; margin-bottom: 0;">(up to 200MB)</p>
+                <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" id="fileInput" required>
+                    <input type="password" name="key" id="keyInput" placeholder="Enter encryption key" required>
+                    <button type="submit" class="button primary fit">Upload <i class="fa fa-upload"></i></button>
+                </form>
+            </div>
+            </br>
+            <div style="display: flex; justify-content: center;">
+                <div style="align-self: center; margin-right: 10px;">
+                    <button id="deleteAccountBtn" class="button primary medium">Delete Account <i class="fa fa-trash-o"></i></button>
+                </div>
+                <div style="align-self: center;">
+                    <button class="button primary medium" onclick="window.location.href='/logout'">Logout <i class="fa fa-sign-in"></i></button>
+                </div>
+            </div>
+        </div>
+        <p style="text-align: center; font-weight: 700; color: #fefefe;">by Meghana Chevva</p>
+    </div>
+
+    <!-- The View File Modal -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('fileModal')">&times;</span>
+            <input type="password" id="viewKey" placeholder="Enter decryption key">
+            <button class="button primary small" onclick="viewFile()">View</button>
+            <pre id="fileContent" style="overflow: scroll;"></pre>
+        </div>
+    </div>
+
+    <!-- The Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content" style="width: 40%;">
+            <span class="close" onclick="closeModal('shareModal')">&times;</span>
+            <form id="shareForm" action="/share" method="post">
+                <input type="hidden" name="fileId" id="shareFileId">
+                <input type="text" id="shareEmail" name="userEmail" placeholder="Enter user email" required>
+                <button class="button primary small" type="submit">Share</button>
+            </form>
+            <h3>Users with access:</h3>
+            <ul id="sharedUsersList"></ul>
+        </div>
+    </div>
+
+    <!-- Generic Alert Modal -->
+    <div id="overlay" class="overlay" style="display: none;"></div>
+    <div id="popup" class="popup" style="display: none;">
+        <span class="close" onclick="closeModalAlert()">&times;</span>
+        <br>
+        <p id="alertMessage" class="alerts" style="width: 100%;"></p>
+    </div>
+
+    <script>
+        if (performance.navigation.type === 1) {
+            // Page was refreshed, remove URL parameters
+            history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        function showAlert(message) {
+            document.getElementById('alertMessage').textContent = message;
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("popup").style.display = "block";
+        }
+        function closeModalAlert() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+            if (modalId === 'fileModal') {
+                document.getElementById('fileContent').textContent = '';
+                document.getElementById('viewKey').value = '';
+            }
+        }
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('fileModal')) {
+                document.getElementById('fileModal').style.display = "none";
+                document.getElementById('fileContent').textContent = '';
+                document.getElementById('viewKey').value = '';
+            }
+            if (event.target == document.getElementById('shareModal')) {
+                document.getElementById('shareModal').style.display = "none";
+                document.getElementById('shareEmail').value = '';
+            }
+            if (event.target == document.getElementById('alertModal')) {
+                document.getElementById('alertModal').style.display = "none";
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const alreadyLoggedIn = urlParams.get('alreadyLoggedIn');
+        if (alreadyLoggedIn === 'true') {
+            showAlert('A session is already active, please continue to the active session');
+        }
+        const FileNotFound = urlParams.get('FileNotFound');
+        if (FileNotFound === 'true') {
+            showAlert('File Not Found');
+        }
+        const InvalidEmail = urlParams.get('InvalidEmail');
+        if (InvalidEmail === 'true') {
+            showAlert('Invalid Email Entered. Please try again');
+        }
+        const UserDoesNotExist = urlParams.get('UserDoesNotExist');
+        if (UserDoesNotExist === 'true') {
+            showAlert('The email you entered isn\'t registered yet.');
+        }
+        const errorRetreivingFile = urlParams.get('errorRetreivingFile');
+        if (errorRetreivingFile === 'true') {
+            showAlert('An Error occured while retreiving the file');
+        }
+        const uploadSuccess = urlParams.get('uploadSuccess');
+        if (uploadSuccess === 'true') {
+            showAlert('File Uploaded Successfully.');
+        }
+        const uploadError = urlParams.get('uploadError');
+        if (uploadError === 'true') {
+            showAlert('File Upload Failed');
+        }
+        const FileAlreadyShared = urlParams.get('FileAlreadyShared');
+        if (FileAlreadyShared === 'true') {
+            showAlert('File already shared with user');
+        }
+        const fileNameDuplicate = urlParams.get('fileNameDuplicate');
+        if (fileNameDuplicate === 'true') {
+            showAlert('A file with same name already exists, rename and upload');
+        }
+        const deleteSuccess = urlParams.get('deleteSuccess');
+        if (deleteSuccess === 'true') {
+            showAlert('File deleted successfully');
+        }
+        const deleteFailed = urlParams.get('deleteFailed');
+        if (deleteFailed === 'true') {
+            showAlert('Uh-Oh! File deletion failed');
+        }
+        const shareSuccess = urlParams.get('ShareSuccess');
+        if (shareSuccess === 'true') {
+            showAlert('File shared successfully');
+        }
+        const unknownError = urlParams.get('UnknownError');
+        if (unknownError === 'true') {
+            showAlert('Sorry! Something went wrong.');
+        }
+        const removeSharedEmailSuccess = urlParams.get('removeSharedEmailSuccess');
+        if (removeSharedEmailSuccess === 'true') {
+            showAlert('File removed successfully')
+        }
+        const shareFailedToSelf= urlParams.get('shareFailedToSelf');
+        if (shareFailedToSelf === 'true') {
+            showAlert('You cannot share a file to yourself.');
+        }
+        let currentFileId;
+        function showViewModal(fileId) {
+            currentFileId = fileId;
+            document.getElementById('fileModal').style.display = "block";
+        }
+
+        function viewFile() {
+            const key = document.getElementById('viewKey').value;
+            fetch(`/file/${currentFileId}?key=${encodeURIComponent(key)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('File Not Found');
+                        } else if (response.status === 400) {
+                            throw new Error('Wrong Key, decryption failed!');
+                        } else {
+                            throw new Error('An error occurred while retrieving the file');
+                        }
+                    }
+                    return response.text();
+                })
+                .then(content => {
+                    document.getElementById('viewKey').innerHTML = '';
+                    document.getElementById('fileContent').textContent = content;
+                })
+                .catch(error => {
+                    console.error('Error fetching file:', error);
+                    document.getElementById('fileContent').textContent = error.message;
+                    document.getElementById('fileModal').style.display = "block";
+                });
+        }
+                function showShareModal(fileId) {
+            document.getElementById('shareFileId').value = fileId;
+            document.getElementById('shareModal').style.display = "block";
+
+            // Fetch and display the list of shared users
+            fetch(`/shared-users/${fileId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch shared users');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const sharedUsersList = document.getElementById('sharedUsersList');
+                    sharedUsersList.innerHTML = ''; // Clear existing list items
+                    if (data.users.length === 0) {
+                        const p = document.createElement('p');
+                        p.textContent = 'Not shared with anyone';
+                        sharedUsersList.appendChild(p);
+                    } else {
+                        data.users.forEach(user => {
+                            const li = document.createElement('li');
+                            li.textContent = user+' ';
+                            const removeButton = document.createElement('button');
+                            removeButton.textContent = 'Remove Access';
+                            removeButton.className = "button primary small"
+                            removeButton.addEventListener('click', () => removeSharedUser(fileId, user));
+                            li.appendChild(removeButton);
+                            sharedUsersList.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching shared users:', error);
+                });
+        }
+
+        function removeSharedUser(fileId, userEmail) {
+            fetch(`/remove-shared-user/${fileId}/${encodeURIComponent(userEmail)}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to remove shared user');
+                    }
+                    // Refresh the shared users list after removal
+                    showShareModal(fileId);
+                })
+                .catch(error => {
+                    console.error('Error removing shared user:', error);
+                });
+        }
+
+        // Client-side validation for .txt file upload
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            const fileInput = document.getElementById('fileInput');
+            const keyInput = document.getElementById('keyInput');
+            const filePath = fileInput.value;
+
+            // Check the file extension
+            const allowedExtensions = /(\.txt)$/i;
+            if (!allowedExtensions.exec(filePath)) {
+                showAlert('Only .txt files are allowed');
+                fileInput.value = '';
+                keyInput.value = '';
+                e.preventDefault();
+            }
+        });
+
+        // Function to confirm delete
+        function confirmDelete(fileId) {
+            const confirmation = window.confirm('Are you sure you want to delete this file?');
+            if (confirmation) {
+                document.getElementById(`deleteForm-${fileId}`).submit();
+            }
+        }
+
+        document.getElementById('deleteAccountBtn').addEventListener('click', function () {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                fetch('/api/delete-account', {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            showAlert('Account deleted successfully.');
+                            window.location.href = '/logout';
+                        } else {
+                            throw new Error('Failed to delete account.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlert('Failed to delete account. Please try again later.');
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>

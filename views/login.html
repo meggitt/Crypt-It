@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            right: 10px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 1;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+            max-width: 400px;
+            width: 100%;
+            display: none;
+            z-index: 2;
+            border: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            border-top: 0;
+            padding: 0rem 1rem 1rem 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container6">
+        <h1>Crypt-it Login</h1>
+        <div class="container5">
+            <form action="/login" method="post">
+                <label class="label">Email</label>
+                <input type="email" name="email" placeholder="Email" required>
+                <label class="label">Password</label>
+                <input type="password" name="password" placeholder="Password" required>
+                <div id="errorMessage" class="error"></div>
+                <a href="/forgotpassword"
+                    style="margin-bottom: 20px; display: block; text-align: right; color:rgb(0, 0, 255); font-weight: 900;">Forgot Password?</a>
+                <button type="submit" class="button primary fit">Login</button>
+            </form>
+            <p style="text-align: center;">Don't have an account? </p>
+            <button type="button" class="button primary fit" onclick="window.location.href='/register'">Register
+                Now</button>
+        </div>
+        <p style="text-align: center; font-weight: 700; color: #fefefe;">by Meghana Chevva</p>
+    </div>
+    <div id="overlay" class="overlay" style="display: none;"></div>
+    <div id="popup" class="popup" style="display: none;">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <br>
+        <p id="popupMessage" class="alerts" style="width: 100%;"></p>
+    </div>
+    <script>
+        if (performance.navigation.type === 1) {
+            // Page was refreshed, remove URL parameters
+            history.replaceState({}, document.title, window.location.pathname);
+        }
+        function showPopup(message) {
+            document.getElementById("popupMessage").textContent = message;
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("popup").style.display = "block";
+        }
+        function closeModal() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("popup").style.display = "none";
+        }
+         // Check if the 'registered' query parameter is present in the URL
+         const urlParams = new URLSearchParams(window.location.search);
+        const registered = urlParams.get('registered');
+        if (registered === 'true') {
+            showPopup('User successfully registered. Login to continue.');
+        }
+        const loginFailed = urlParams.get('loginFailed');
+        if (loginFailed === 'true') {
+            showPopup('Invalid Login Credentials');
+        }
+        const alreadyRegistered = urlParams.get('alreadyRegistered');
+        if (alreadyRegistered === 'true') {
+            showPopup('User already registered. Login to continue.');
+        }
+        const alreadyLoggedIn = urlParams.get('alreadyLoggedIn');
+        if (alreadyLoggedIn === 'true') {
+            showPopup('A session is already active, please continue to the active session.');
+        }
+        const userDoesNotExist = urlParams.get('userDoesNotExist');
+        if (userDoesNotExist === 'true') {
+            showPopup('An account with this email doesn\'t exist.');
+        }
+        const loginError = urlParams.get('loginError');
+        if (loginError === 'true') {
+            showPopup('Something went wrong. Try again later.');
+        }
+        const passwordReset = urlParams.get('passwordReset');
+        if (passwordReset === 'true') {
+            showPopup('Password Reset Successful.');
+        }
+    </script>
+</body>
+
+</html>
