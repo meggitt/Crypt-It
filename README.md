@@ -1,6 +1,7 @@
 # Crypt-It
 ![Crypt-It by Meghana Chevva](images/crypt-it.gif)
-Crypt-It is a robust Node.js application designed for secure file sharing and management. It empowers users with seamless registration, authentication, and file handling capabilities while prioritizing data security through advanced encryption techniques. Whether you're uploading sensitive documents or collaborating on confidential projects, Crypt-It ensures that your information remains private and protected at every step.
+
+Crypt-It is a robust Node.js application designed for secure file sharing and management. It provides users with seamless registration, authentication, and file handling capabilities while prioritizing data security through advanced encryption techniques. Whether you're uploading sensitive documents or collaborating on confidential projects, Crypt-It ensures that your information remains private and protected at every step.
 
 
 ## Table of Contents
@@ -12,6 +13,7 @@ Crypt-It is a robust Node.js application designed for secure file sharing and ma
 - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
 - [Security Considerations](#security-considerations)
+- [Scenarios Handled In Route](#scenarios-handled-in-routes)
 - [Contributions](#contributions)
 
 ## Features
@@ -30,6 +32,8 @@ Crypt-It is a robust Node.js application designed for secure file sharing and ma
 
 ## Installation
 
+### Option 1: Clone Repository
+
 1. **Clone the repository:**
 
 ```bash
@@ -42,7 +46,24 @@ cd Crypt-It
 ```bash
 npm install
 ```
+### Option 2: Download Zip File
 
+1. **Download Zip File:**
+
+    - Go to the [project repository](https://github.com/meggitt/ZnakeXenzia).
+    - Click on the green `Code` button.
+    - Select `Download ZIP`.
+
+2. **Extract Files:**
+
+    - Extract the downloaded ZIP file to your desired location.
+      
+3. **Install dependencies:**
+
+```bash
+npm install
+```
+      
 ## Environment Variables
 
 Create a `.env` file in the root directory of the project with the following content:
@@ -106,7 +127,7 @@ The server should now be running on the port specified in the `.env` file.
 - Regularly update your dependencies to avoid known vulnerabilities.
 - Implement rate limiting to prevent brute-force attacks.
 
-### Scenarios Handled in Routes
+## Scenarios Handled in Routes
 
 1. **Root Route and Register Route**
    - **GET /**: Renders the registration page (`register.html`).
